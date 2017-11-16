@@ -6,10 +6,11 @@ import createReactClass from 'create-react-class'
 import {
 	ColorPropType,
 	requireNativeComponent,
-	ViewPropTypes
+	ViewPropTypes,
+	NativeModules,
 } from 'react-native';
 
-
+var WheelCurvedPickerModule = NativeModules.WheelCurvedPicker;
 var WheelCurvedPicker = createReactClass ({
 
 	propTypes: {
@@ -18,6 +19,7 @@ var WheelCurvedPicker = createReactClass ({
 		data: PropTypes.array,
 
 		textColor: ColorPropType,
+		selectedTextColor: ColorPropType,
 		textSize: PropTypes.number,
 		itemStyle: PropTypes.object,
 		itemSpace: PropTypes.number,
@@ -29,7 +31,11 @@ var WheelCurvedPicker = createReactClass ({
 
 	getDefaultProps(): Object {
 		return {
-			itemStyle : {color:"white", fontSize:26},
+			itemStyle : {
+				color:"white",
+				selectedTextColor: "red",
+				fontSize:26,
+			},
 			itemSpace: 20,
 			selectedLineColor: "black",
 		};
@@ -55,8 +61,8 @@ var WheelCurvedPicker = createReactClass ({
 
 		var textSize = props.itemStyle.fontSize
 		var textColor = props.itemStyle.color
-
-		return {selectedIndex, items, textSize, textColor};
+		var selectedTextColor = props.itemStyle.selectedTextColor;
+		return {selectedIndex, items, textSize, textColor, selectedTextColor};
 	},
 
 	_onValueChange: function(e: Event) {
@@ -65,14 +71,22 @@ var WheelCurvedPicker = createReactClass ({
 		}
 	},
 
+	getSelectedItem: function() {
+		return WheelCurvedPickerModule.getSelectedItem();
+	},
+
 	render() {
-		return <WheelCurvedPickerNative
+		return (
+			<WheelCurvedPickerNative
 				{...this.props}
 				onValueChange={this._onValueChange}
 				data={this.state.items}
 				textColor={this.state.textColor}
+				selectedTextColor={this.state.selectedTextColor}
 				textSize={this.state.textSize}
-				selectedIndex={parseInt(this.state.selectedIndex)} />;
+				selectedIndex={parseInt(this.state.selectedIndex)}
+			/>
+		);
 	}
 });
 

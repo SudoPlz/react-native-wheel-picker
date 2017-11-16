@@ -2,7 +2,9 @@ package com.zyu;
 
 import android.graphics.Color;
 
-import com.aigestudio.wheelpicker.core.AbstractWheelPicker;
+import com.aigestudio.wheelpicker.WheelPicker;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
@@ -27,9 +29,9 @@ public class ReactWheelCurvedPickerManager extends SimpleViewManager<ReactWheelC
     @Override
     protected ReactWheelCurvedPicker createViewInstance(ThemedReactContext reactContext) {
         ReactWheelCurvedPicker picker = new ReactWheelCurvedPicker(reactContext);
-        picker.setTextColor(Color.LTGRAY);
-        picker.setCurrentTextColor(Color.WHITE);
-        picker.setTextSize(DEFAULT_TEXT_SIZE);
+        picker.setItemTextColor(Color.LTGRAY);
+        picker.setSelectedItemTextColor(Color.WHITE);
+        picker.setItemTextSize(DEFAULT_TEXT_SIZE);
         picker.setItemSpace(DEFAULT_ITEM_SPACE);
 
         return picker;
@@ -59,9 +61,23 @@ public class ReactWheelCurvedPickerManager extends SimpleViewManager<ReactWheelC
 
     @ReactProp(name="selectedIndex")
     public void setSelectedIndex(ReactWheelCurvedPicker picker, int index) {
-        if (picker != null && picker.getState() == AbstractWheelPicker.SCROLL_STATE_IDLE) {
-            picker.setItemIndex(index);
+        if (picker != null && picker.getState() == WheelPicker.SCROLL_STATE_IDLE) {
+            picker.setSelectedItemPosition(index);
             picker.invalidate();
+        }
+    }
+
+    @ReactProp(name="textColor", customType = "Color")
+    public void setTextColor(ReactWheelCurvedPicker picker, Integer color) {
+        if (picker != null) {
+            picker.setItemTextColor(color);
+        }
+    }
+
+    @ReactProp(name="selectedTextColor", customType = "Color")
+    public void setSelectedTextColor(ReactWheelCurvedPicker picker, Integer color) {
+        if (picker != null) {
+            picker.setSelectedItemTextColor(color);
         }
     }
 
@@ -72,18 +88,10 @@ public class ReactWheelCurvedPickerManager extends SimpleViewManager<ReactWheelC
         }
     }
 
-    @ReactProp(name="textColor", customType = "Color")
-    public void setTextColor(ReactWheelCurvedPicker picker, Integer color) {
-        if (picker != null) {
-            picker.setCurrentTextColor(color);
-            picker.setTextColor(color);
-        }
-    }
-
     @ReactProp(name="textSize")
     public void setTextSize(ReactWheelCurvedPicker picker, int size) {
         if (picker != null) {
-            picker.setTextSize((int) PixelUtil.toPixelFromDIP(size));
+            picker.setItemTextSize((int) PixelUtil.toPixelFromDIP(size));
         }
     }
 
@@ -91,6 +99,15 @@ public class ReactWheelCurvedPickerManager extends SimpleViewManager<ReactWheelC
     public void setItemSpace(ReactWheelCurvedPicker picker, int space) {
         if (picker != null) {
             picker.setItemSpace((int) PixelUtil.toPixelFromDIP(space));
+        }
+    }
+
+    @ReactMethod
+    public void getSelectedItem(ReactWheelCurvedPicker picker, Promise promise) {
+        if (picker != null) {
+            promise.resolve(picker.getCurrentSelectedItem());
+        } else {
+            promise.reject(new java.lang.RuntimeException("No value selected"));
         }
     }
 
